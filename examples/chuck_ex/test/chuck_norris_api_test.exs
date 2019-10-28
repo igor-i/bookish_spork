@@ -26,4 +26,18 @@ defmodule ChuckNorrisApiTest do
     {:ok, request} = :bookish_spork.capture_request
     assert request.uri == '/jokes/random?category=dev'
   end
+
+  test "retrieves two random jokes in different processes" do
+    :bookish_spork.stub_request([200, %{}, "{\"value\": \"First joke.\"}"])
+    :bookish_spork.stub_request([200, %{}, "{\"value\": \"Second joke.\"}"])
+
+    Task.start(fn -> ChuckNorrisApi.random() end)
+    Task.start(fn -> ChuckNorrisApi.random() end)
+
+    Process.sleep(500)
+
+    {:ok, _request} = :bookish_spork.capture_request()
+    {:ok, _request} = :bookish_spork.capture_request()
+    {:error, _request} = :bookish_spork.capture_request()
+  end
 end

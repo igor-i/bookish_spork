@@ -10,7 +10,8 @@ defmodule ChuckNorrisApi do
   end
 
   defp request(url) do
-    HTTPoison.get!(url).body |> Poison.decode! |> Map.fetch!("value")
+    HTTPoison.get!(url, [{"Connection", "close"}]).body |> Poison.decode! |> Map.fetch!("value")
+    # HTTPoison.get!(url).body |> IO.inspect |> Poison.decode! |> IO.inspect |> Map.fetch!("value")
   end
 
   defp url do
